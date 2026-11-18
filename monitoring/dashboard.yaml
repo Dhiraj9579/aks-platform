@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-app-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  sample-app.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "panels": [
+        {"type":"stat","title":"Requests / 5m","gridPos":{"h":5,"w":6,"x":0,"y":0},"targets":[{"expr":"sum(increase(app_http_requests_total[5m]))","legendFormat":"requests"}]},
+        {"type":"timeseries","title":"Request rate","gridPos":{"h":8,"w":12,"x":6,"y":0},"targets":[{"expr":"sum by (path) (rate(app_http_requests_total[5m]))","legendFormat":"{{path}}"}]},
+        {"type":"timeseries","title":"p95 response time (seconds)","gridPos":{"h":8,"w":12,"x":0,"y":5},"targets":[{"expr":"histogram_quantile(0.95, sum by (le) (rate(app_http_request_duration_seconds_bucket[5m])))","legendFormat":"p95"}]},
+        {"type":"timeseries","title":"HTTP 5xx rate","gridPos":{"h":8,"w":12,"x":12,"y":5},"targets":[{"expr":"sum(rate(app_http_requests_total{status_code=~\"5..\"}[5m]))","legendFormat":"5xx/sec"}]},
+        {"type":"timeseries","title":"CPU cores","gridPos":{"h":8,"w":12,"x":0,"y":13},"targets":[{"expr":"sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"sample-app\",container=\"sample-web\"}[5m]))","legendFormat":"{{pod}}"}]},
+        {"type":"timeseries","title":"Memory working set","gridPos":{"h":8,"w":12,"x":12,"y":13},"targets":[{"expr":"sum by (pod) (container_memory_working_set_bytes{namespace=\"sample-app\",container=\"sample-web\"})","legendFormat":"{{pod}}"}]}
+      ],
+      "schemaVersion": 39,
+      "tags": ["application", "daily-report"],
+      "templating": {"list": []},
+      "time": {"from": "now-24h", "to": "now"},
+      "title": "Sample App / Daily Performance",
+      "uid": "sample-app-daily",
+      "version": 1
+    }

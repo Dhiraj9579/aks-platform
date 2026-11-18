@@ -1,0 +1,5 @@
+name_prefix          = "aksdemo"
+location             = "eastus"
+acr_replica_location = "eastus2"
+aks_admin_object_ids = []
+ci_principal_object_id = null
